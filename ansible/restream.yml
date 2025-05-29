@@ -1,0 +1,45 @@
+- name: Launch Restreamer Docker 
+  hosts: all
+  become: yes
+  gather_facts: true
+
+  collections:
+    - community.docker
+
+  tasks:
+    - name: Docker is installed
+      apt:
+        name: docker.io
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Create directory structure for volumes
+      file:
+        path: "/opt/restreamer/{{ item }}"
+        state: directory
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_gid }}"
+      loop:
+        - config
+        - data
+
+    - name: Pull the latest Docker image
+      docker_image:
+        name: datarhei/restreamer
+        source: pull
+        tag: latest
+
+    - name: Start the Docker container
+      docker_container:
+        name: restreamer
+        image: datarhei/restreamer:latest
+        state: started
+        restart_policy: always
+        detach: true
+        ports:
+          - "8080:8080"
+          - "8181:8181"
+          - "1935:1935"
+        volumes:
+          - "/opt/restreamer/config:/core/config"
+          - "/opt/restreamer/data:/core/data"
