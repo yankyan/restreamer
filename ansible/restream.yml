@@ -9,6 +9,7 @@
   tasks:
     - name: Docker is installed
       apt:
+        update_cache: yes
         name: docker.io
         state: present
       when: ansible_os_family == "Debian"

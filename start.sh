@@ -8,6 +8,8 @@ terraform apply -auto-approve || { echo "Terraform apply failed"; exit 1; }
 INSTANCE_IP=$(terraform output -json | jq -r '.instance_public_ip.value')
 echo "Instance IP: ${INSTANCE_IP}"
 cd ..
+# 3. Делаем паузу 10 секунд 
+sleep 10
 # 4. Запускаем Ansible
 cd ansible || exit
 echo "Running Ansible..."
